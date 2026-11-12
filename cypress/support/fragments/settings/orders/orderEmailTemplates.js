@@ -4,11 +4,14 @@ import {
   Button,
   DropdownMenu,
   KeyValue,
+  Modal,
   NavListItem,
   Pane,
   Section,
   including,
 } from '../../../../../interactors';
+import { COMMON_BUTTON_LABELS } from '../../../constants';
+import InteractorsTools from '../../../utils/interactorsTools';
 import getRandomPostfix from '../../../utils/stringTools';
 
 // TODO: verify on first run - category under which ui-orders stores order email templates
@@ -17,6 +20,7 @@ const ORDER_EMAIL_TEMPLATE_CATEGORY = 'Order';
 const settingsNavPane = Section({ id: 'settings-nav-pane' });
 const listPane = Pane('Order email templates');
 const actionsButton = Button('Actions');
+const deleteModal = Modal('Delete Order email template');
 
 export default {
   getDefaultOrderEmailTemplate({ active = true, ...overrides } = {}) {
@@ -114,5 +118,34 @@ export default {
     actions.forEach((action) => {
       cy.expect(DropdownMenu().find(Button(action)).exists());
     });
+  },
+
+  openDeleteModal(templateName) {
+    this.openActionsMenu(templateName);
+    cy.do(DropdownMenu().find(Button(COMMON_BUTTON_LABELS.DELETE)).click());
+    cy.expect([
+      deleteModal.exists(),
+      deleteModal.has({ message: including(`${templateName} will be removed`) }),
+      deleteModal.find(Button(COMMON_BUTTON_LABELS.CANCEL)).exists(),
+      deleteModal.find(Button(COMMON_BUTTON_LABELS.DELETE)).has({ focused: true }),
+    ]);
+  },
+
+  cancelDeletion(templateName) {
+    cy.do(deleteModal.find(Button(COMMON_BUTTON_LABELS.CANCEL)).click());
+    cy.expect([
+      deleteModal.absent(),
+      listPane.find(NavListItem(templateName)).exists(),
+      Pane(templateName).exists(),
+    ]);
+  },
+
+  confirmDeletion(templateName) {
+    cy.do(deleteModal.find(Button(COMMON_BUTTON_LABELS.DELETE)).click());
+    cy.expect(deleteModal.absent());
+    InteractorsTools.checkCalloutMessage(
+      `The order email template ${templateName} was successfully deleted.`,
+    );
+    cy.expect(listPane.find(NavListItem(templateName)).absent());
   },
 };
