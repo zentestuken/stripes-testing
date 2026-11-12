@@ -1,6 +1,13 @@
 import uuid from 'uuid';
 
-import { Button, NavListItem, Pane } from '../../../../../interactors';
+import {
+  Accordion,
+  Button,
+  KeyValue,
+  NavListItem,
+  Pane,
+  including,
+} from '../../../../../interactors';
 import getRandomPostfix from '../../../utils/stringTools';
 
 const EMAIL_TEMPLATES_SCOPE = 'orders-email';
@@ -8,6 +15,9 @@ const EMAIL_TEMPLATES_TITLE = 'Order email templates';
 
 const ordersSettingsPane = Pane('Orders');
 const emailTemplatesPane = Pane(EMAIL_TEMPLATES_TITLE);
+
+const GENERAL_INFORMATION_ACCORDION = 'General information';
+const TEMPLATE_CONTENT_ACCORDION = 'Template content';
 
 export default {
   getDefaultOrderEmailTemplate({ additionalProperties = {} } = {}) {
@@ -72,5 +82,43 @@ export default {
 
   verifyTemplatesListed(templateNames) {
     templateNames.forEach((templateName) => this.verifyTemplateListed(templateName));
+  },
+
+  selectTemplate(templateName) {
+    cy.do(emailTemplatesPane.find(NavListItem(templateName)).click());
+    cy.expect(Pane(templateName).exists());
+  },
+
+  verifyTemplateDetailsPane(templateName) {
+    const detailsPane = Pane(templateName);
+
+    cy.expect([
+      detailsPane.find(Button(including('Record last updated'))).exists(),
+      detailsPane.find(Accordion(GENERAL_INFORMATION_ACCORDION)).exists(),
+      detailsPane.find(Accordion(TEMPLATE_CONTENT_ACCORDION)).exists(),
+    ]);
+  },
+
+  verifyGeneralInformation(templateName, { name, active, description }) {
+    const generalInformation = Pane(templateName).find(Accordion(GENERAL_INFORMATION_ACCORDION));
+
+    cy.do(generalInformation.expand());
+    cy.expect([
+      generalInformation.find(KeyValue('Template name')).has({ value: name }),
+      generalInformation.find(KeyValue('Active')).has({ value: active }),
+      generalInformation.find(KeyValue('Description')).has({ value: description }),
+    ]);
+  },
+
+  verifyTemplateContent(templateName, { subject, body }) {
+    const templateContent = Pane(templateName).find(Accordion(TEMPLATE_CONTENT_ACCORDION));
+
+    cy.do(templateContent.expand());
+    cy.expect([
+      templateContent.find(KeyValue('Email subject')).has({ value: subject }),
+      templateContent.has({ content: including('Email body') }),
+      templateContent.has({ content: including(body) }),
+      templateContent.find(Button('Preview')).exists(),
+    ]);
   },
 };
