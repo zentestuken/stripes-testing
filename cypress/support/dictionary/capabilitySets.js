@@ -449,6 +449,12 @@ export default {
     resource: 'UI-Orders Settings',
     action: CAPABILITY_ACTIONS.MANAGE,
   },
+  // Capability set name not confirmed against ui-orders - verify on first run
+  uiOrdersSettingsEmailTemplatesView: {
+    type: CAPABILITY_TYPES.SETTINGS,
+    resource: 'UI-Orders Settings Email-Templates',
+    action: CAPABILITY_ACTIONS.VIEW,
+  },
   uiOrdersSettingsOrderTemplatesEdit: {
     type: CAPABILITY_TYPES.SETTINGS,
     resource: 'UI-Orders Settings Order-Templates',

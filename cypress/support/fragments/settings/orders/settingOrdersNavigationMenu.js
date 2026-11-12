@@ -10,6 +10,9 @@ export default {
   selectOrderTemplates: () => {
     cy.do(NavListItem('Order templates').click());
   },
+  selectOrderEmailTemplates: () => {
+    cy.do(NavListItem('Order email templates').click());
+  },
   selectPurchaseOrderLinesLimit: () => {
     cy.do(NavListItem('Purchase order lines limit').click());
   },
