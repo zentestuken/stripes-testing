@@ -7,6 +7,9 @@ export default {
   selectClosingPurchaseOrderReasons: () => {
     cy.do(NavListItem('Closing purchase order reasons').click());
   },
+  selectOrderEmailTemplates: () => {
+    cy.do(NavListItem('Order email templates').click());
+  },
   selectOrderTemplates: () => {
     cy.do(NavListItem('Order templates').click());
   },

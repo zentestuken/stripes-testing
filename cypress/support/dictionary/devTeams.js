@@ -10,4 +10,5 @@ export default {
   ideaLabsTests: 'ideaLabsTests',
   erm: 'erm',
   corsair: 'corsair',
+  dresden: 'dresden',
 };
