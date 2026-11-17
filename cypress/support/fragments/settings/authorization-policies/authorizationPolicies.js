@@ -13,6 +13,7 @@ import {
   MultiColumnListCell,
   KeyValue,
   Callout,
+  or,
 } from '../../../../../interactors';
 import { AUTHORIZATION_POLICIES_COLUMNS } from '../../../constants';
 import InteractorsTools from '../../../utils/interactorsTools';
@@ -26,7 +27,10 @@ const recordLastUpdatedHeader = generalInformationAccordion.find(
 );
 const policySearchInputField = policiesPane.find(TextField({ testid: 'search-field' }));
 const policySearchButton = policiesPane.find(Button({ dataTestID: 'search-button' }));
-const newButton = policiesPane.find(Button('+ New'));
+const newButton = policiesPane.find(Button(or('+ New', 'New')));
+const createPolicyPane = Pane('Create policy');
+const policyNameField = TextField(including('Name'));
+const saveAndCloseButton = Button('Save & close');
 const metadataAccordion = Button({ text: including('Record last updated: ') });
 const actionsButton = Button('Actions');
 const clearFieldButton = Button({ icon: 'times-circle-solid' });
@@ -133,6 +137,44 @@ export default {
   checkNewButtonShown: (isShown = true) => {
     if (isShown) cy.expect(newButton.exists());
     else cy.expect(newButton.absent());
+  },
+
+  verifyNewButtonLabel: () => {
+    cy.expect([
+      policiesPane.find(Button('New')).exists(),
+      policiesPane.find(Button('+ New')).absent(),
+    ]);
+  },
+
+  clickNewButton: () => {
+    cy.do(newButton.click());
+    cy.expect([
+      createPolicyPane.exists(),
+      createPolicyPane.find(policyNameField).has({ value: '' }),
+      createPolicyPane.find(saveAndCloseButton).has({ disabled: true }),
+      Spinner().absent(),
+    ]);
+  },
+
+  closePolicyCreateView: () => {
+    cy.do(
+      createPolicyPane
+        .find(PaneHeader())
+        .find(Button({ icon: 'times' }))
+        .click(),
+    );
+    cy.expect(createPolicyPane.absent());
+  },
+
+  getPoliciesCount: () => {
+    let count;
+    return cy
+      .do(
+        policiesPane.find(MultiColumnList()).perform((element) => {
+          count = element.querySelectorAll('[class*=mclRow-]').length;
+        }),
+      )
+      .then(() => count);
   },
 
   checkActionsButtonShownForPolicy(policyName, isShown = true) {
