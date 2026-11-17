@@ -13,6 +13,7 @@ import {
   MultiColumnListCell,
   KeyValue,
   Callout,
+  or,
 } from '../../../../../interactors';
 import { AUTHORIZATION_POLICIES_COLUMNS } from '../../../constants';
 import InteractorsTools from '../../../utils/interactorsTools';
@@ -26,7 +27,7 @@ const recordLastUpdatedHeader = generalInformationAccordion.find(
 );
 const policySearchInputField = policiesPane.find(TextField({ testid: 'search-field' }));
 const policySearchButton = policiesPane.find(Button({ dataTestID: 'search-button' }));
-const newButton = policiesPane.find(Button('+ New'));
+const newButton = policiesPane.find(Button(or('+ New', 'New')));
 const metadataAccordion = Button({ text: including('Record last updated: ') });
 const actionsButton = Button('Actions');
 const clearFieldButton = Button({ icon: 'times-circle-solid' });
@@ -133,6 +134,13 @@ export default {
   checkNewButtonShown: (isShown = true) => {
     if (isShown) cy.expect(newButton.exists());
     else cy.expect(newButton.absent());
+  },
+
+  verifyNewButtonLabelWithoutPlus: () => {
+    cy.expect([
+      policiesPane.find(Button('New')).exists(),
+      policiesPane.find(Button('+ New')).absent(),
+    ]);
   },
 
   checkActionsButtonShownForPolicy(policyName, isShown = true) {

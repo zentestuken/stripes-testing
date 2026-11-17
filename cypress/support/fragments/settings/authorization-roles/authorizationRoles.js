@@ -1047,6 +1047,10 @@ export default {
     else cy.expect(newButton.absent());
   },
 
+  verifyNewButtonLabelWithoutPlus: () => {
+    cy.expect([rolesPane.find(Button('New')).exists(), rolesPane.find(Button('+ New')).absent()]);
+  },
+
   checkActionsOptionsAvailable: (
     editShown = true,
     duplicateShown = true,
