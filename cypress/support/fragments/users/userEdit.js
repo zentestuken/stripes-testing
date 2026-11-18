@@ -1532,6 +1532,15 @@ export default {
     }
   },
 
+  verifyUserRolesAccordionState({ isShown = true, isOpen } = {}) {
+    if (!isShown) {
+      cy.expect(userRolesAccordion.absent());
+      return;
+    }
+    cy.expect(userRolesAccordion.exists());
+    if (typeof isOpen === 'boolean') cy.expect(userRolesAccordion.has({ open: isOpen }));
+  },
+
   // Idempotent - only expands if currently collapsed. Useful after navigating away and back
   // (e.g. via cy.go('back')), where accordion state may or may not have survived
   ensureUserRolesAccordionExpanded(isEditable = true) {
